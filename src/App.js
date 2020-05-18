@@ -5,6 +5,7 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import CharacterForm from "./components/characterForm";
 
 export default function App() {
   return (
@@ -25,8 +26,4 @@ export default function App() {
       </div>
     </Router>
   );
-}
-
-function CharacterForm() {
-  return <h2>placeholder for character form</h2>
 }
