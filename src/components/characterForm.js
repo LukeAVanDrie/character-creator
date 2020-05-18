@@ -19,7 +19,7 @@ export default class CharacterForm extends React.Component {
                       <Field
                         name="name"
                         label="Name"
-                        defaultValue=""
+                        defaultValue={JSON.parse(localStorage.getItem('values')).name}
                       >
                           {({ fieldProps }) => <Input { ...fieldProps } />}
                       </Field>
