@@ -4,27 +4,33 @@ import Form, { Field } from "@wedgekit/form";
 
 export default class CharacterForm extends React.Component {
     handleSubmit = async values => {
-        // placeholder for saving to local storage
+        // submit delay
         const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         await sleep(300);
-        
-        window.alert(JSON.stringify(values));
+
+        localStorage.setItem("values", JSON.stringify(values));
+
+        // placeholder for re-route to character sheet
+        window.alert(localStorage.getItem("values"));
     }
     
     render() {
         return (
             <Form onSubmit={ this.handleSubmit }>
-              {({ formProps, dirty, submitting }) => (
+              {({ formProps, submitting }) => (
                   <form { ...formProps }>
                       <Field
                         name="name"
                         label="Name"
-                        defaultValue=""
+                        defaultValue={ localStorage.getItem("values")
+                            ?  JSON.parse(localStorage.getItem("values")).name
+                            : "" 
+                        }
                       >
                           {({ fieldProps }) => <Input { ...fieldProps } />}
                       </Field>
-                      <Button domain="primary" type="submit" disabled={ !dirty || submitting }>
-                          Create
+                      <Button domain="primary" type="submit" disabled={ submitting }>
+                          { localStorage.getItem("values") ? "Save" : "Create" }
                       </Button>
                   </form>
               )}
