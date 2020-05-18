@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^7.1.2",
     "@wedgekit/core": "^11.2.9",
     "@wedgekit/form": "^0.4.1",
+    "ava": "^3.8.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
@@ -17,7 +18,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "ava",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
