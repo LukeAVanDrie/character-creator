@@ -6,8 +6,11 @@ import Form, { Field } from "@wedgekit/form";
 export default class CharacterForm extends React.Component {
     constructor(props) {
         super(props);
-
-        const redirect = (localStorage.getItem("values")) ? true : false;
+        
+        const redirect = 
+            (localStorage.getItem("values") && !props.location.state.edit) 
+                ? true 
+                : false;
         this.state = { redirect: redirect }
 
         this.handleSubmit = this.handleSubmit.bind(this);
