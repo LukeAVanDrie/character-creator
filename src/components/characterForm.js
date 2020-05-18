@@ -4,11 +4,11 @@ import Form, { Field } from "@wedgekit/form";
 
 export default class CharacterForm extends React.Component {
     handleSubmit = async values => {
-        // placeholder for saving to local storage
         const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         await sleep(300);
-        
-        window.alert(JSON.stringify(values));
+
+        localStorage.setItem('values', JSON.stringify(values));
+        window.alert(localStorage.getItem('values'));
     }
     
     render() {
