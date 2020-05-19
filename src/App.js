@@ -3,25 +3,19 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Redirect
 } from "react-router-dom";
 import CharacterForm from "./components/characterForm";
+import CharacterSheet from "./components/characterSheet";
 
-export default function App() {
+export default function App() {  
   return (
     <Router>
+      <Redirect from="/" exact to="/character_sheet"/>
       <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Create a Character</Link>
-            </li>
-          </ul>
-        </nav>
         <Switch>
-          <Route path="/">
-            <CharacterForm/>
-          </Route>
+          <Route exact path="/character_form" component={ CharacterForm }/>
+          <Route exact path="/character_sheet" component={ CharacterSheet }/>
         </Switch>
       </div>
     </Router>

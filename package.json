@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^7.1.2",
     "@wedgekit/core": "^11.2.9",
     "@wedgekit/form": "^0.4.1",
+    "@wedgekit/layout": "^0.4.3",
     "ava": "^3.8.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

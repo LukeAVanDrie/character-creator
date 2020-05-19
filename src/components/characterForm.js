@@ -1,20 +1,37 @@
 import React from "react";
+import { Redirect } from "react-router-dom";
 import { Input, Button } from "@wedgekit/core";
 import Form, { Field } from "@wedgekit/form";
 
 export default class CharacterForm extends React.Component {
+    constructor(props) {
+        super(props);
+        
+        const redirect = 
+            (localStorage.getItem("values") && !props.location.state.edit) 
+                ? true 
+                : false;
+        this.state = { redirect: redirect }
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
     handleSubmit = async values => {
-        // submit delay
         const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         await sleep(300);
 
         localStorage.setItem("values", JSON.stringify(values));
 
-        // placeholder for re-route to character sheet
-        window.alert(localStorage.getItem("values"));
+        this.setState({
+            redirect: true
+        });
     }
     
     render() {
+        if (this.state.redirect) {
+            return <Redirect to="/character_sheet"/>
+        }
+
         return (
             <Form onSubmit={ this.handleSubmit }>
               {({ formProps, submitting }) => (

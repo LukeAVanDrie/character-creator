@@ -1891,6 +1891,11 @@
   dependencies:
     "@wedgekit/color" "^3.0.0"
 
+"@wedgekit/layout@^0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@wedgekit/layout/-/layout-0.4.3.tgz#913d493ed03ce0868f8ce996ee1f594386cb381a"
+  integrity sha512-CAgEpcCU+aYGErlHQg8UZ9fiKiqdK8v/Dn7DLj8/GSUoQInlFP+8hpHVZujz7In0NrLjYPTPwU1js1zge+aG+g==
+
 "@wedgekit/primitives@^1.3.13":
   version "1.3.13"
   resolved "https://registry.yarnpkg.com/@wedgekit/primitives/-/primitives-1.3.13.tgz#7c75309924635ad4c4c56f8fa0f8830fe887c4d0"
