@@ -10,13 +10,16 @@ import {
     LightfootHalfling, StoutHalfling, HalfOrc,
     Human, Tiefling, Race 
 } from "../models/races/bundle";
-import { LanguageEnum, ToolEnum, AncestryEnum } from "../models/enums/bundle"; 
+import { LanguageEnum, ToolEnum, AncestryEnum, SizeEnum } from "../models/enums/bundle"; 
 
 const styles = {
     card: {
-        margin: "0 auto",
+        margin: "3em auto",
         width: "50%",
-        height: "100vh"
+    },
+    button: {
+        margin: "1em auto",
+        width: "35%"
     }
 }
 
@@ -190,7 +193,7 @@ export default class CharacterForm extends React.Component {
 
         const renderLanguageDropdown = () => {
             if (this.state.languageDropdown) {
-                const languages = Object.keys(LanguageEnum).map(language => {
+                let languages = Object.keys(LanguageEnum).map(language => {
                     return { id: language, display: LanguageEnum[language] };
                 });
 
@@ -268,6 +271,7 @@ export default class CharacterForm extends React.Component {
 
         return (
             <Card style={ styles.card }>
+                <h2>Create Your Character</h2>
                 <Form onSubmit={ this.handleSubmit }>
                 {({ formProps, submitting }) => (
                     <form { ...formProps }>
@@ -310,8 +314,14 @@ export default class CharacterForm extends React.Component {
                         { renderLanguageDropdown() }
                         { renderToolProficiencyDropdown() }
                         { renderAncestryDropdown() }
-                        <Button domain="primary" type="submit" disabled={ submitting || !this.validCharacter() }>
-                            { localStorage.getItem("values") ? "Save" : "Create" }
+                        <Button 
+                            fullWidth 
+                            domain="primary" 
+                            type="submit" 
+                            disabled={ submitting || !this.validCharacter() } 
+                            style={ styles.button }
+                        >
+                            { localStorage.getItem("formData") ? "Save" : "Create" }
                         </Button>
                     </form>
                 )}

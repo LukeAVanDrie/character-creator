@@ -1,7 +1,7 @@
 export const SizeEnum = {
-    SMALL: 1,
-    MEDIUM: 2,
-    LARGE: 3
+    SMALL: "Small",
+    MEDIUM: "Medium",
+    LARGE: "Large"
 }
 
 Object.freeze(SizeEnum);
