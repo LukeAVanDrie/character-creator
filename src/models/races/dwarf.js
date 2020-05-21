@@ -1,4 +1,9 @@
-class Dwarf extends Race {
+import Race from "./race";
+import Age from "../age";
+import Stats from "../stats";
+import { LanguageEnum, SizeEnum, WeaponEnum, ArmorEnum } from "../enums/bundle";
+
+export class Dwarf extends Race {
     constructor(name, subArmorProfs, toolProf, subStatBonuses) {
         if (new.target === Dwarf) {
             throw new TypeError("cannot directly instantiate the abstract instance Dwarf")
@@ -22,23 +27,43 @@ class Dwarf extends Race {
     }
 }
 
-class HillDwarf extends Dwarf {
-    constuctor(toolProf) {
+export class HillDwarf extends Dwarf {
+    constructor(toolProficiency) {
         const statBonuses = {
             "wisdom": 1
         }
 
-        super("Hill Dwarf", toolProf, statBonuses);
+        super("Hill Dwarf", [], toolProficiency, statBonuses);
     }
+
+    static generate(args) {
+        const requiredArgs = ["toolProficiency"];
+        const result = Race.validateArgs(args, requiredArgs);
+        return {
+            missingArgs: result.missingArgs,
+            requiredArgs: requiredArgs,
+            class: (result.missingArgs.length > 0) ? undefined : new HillDwarf(...result.finalArgs)
+        }
+    } 
 }
 
-class MountainDwarf extends Dwarf {
-    constuctor(toolProf) {
+export class MountainDwarf extends Dwarf {
+    constructor(toolProficiency) {
         const armorProfs = [ArmorEnum.LIGHT, ArmorEnum.MEDIUM];
         const statBonuses = {
             "strength": 2
         }
 
-        super("Mountain Dwarf", armorProfs, toolProf, statBonuses);
+        super("Mountain Dwarf", armorProfs, toolProficiency, statBonuses);
     }
+
+    static generate(args) {
+        const requiredArgs = ["toolProficiency"];
+        const result = Race.validateArgs(args, requiredArgs);
+        return {
+            missingArgs: result.missingArgs,
+            requiredArgs: requiredArgs,
+            class: (result.missingArgs.length > 0) ? undefined : new MountainDwarf(...result.finalArgs)
+        }
+    } 
 }

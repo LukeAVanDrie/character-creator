@@ -1,4 +1,8 @@
-class Tiefling extends Race {
+import Race from "./race";
+import Age from "../age";
+import { LanguageEnum, SizeEnum } from "../enums/bundle";
+
+export class Tiefling extends Race {
     constructor() {
         const age = new Age(18, 100);
         const languages = [LanguageEnum.COMMON, LanguageEnum.INFERNAL];
@@ -9,4 +13,12 @@ class Tiefling extends Race {
 
         super("Tiefling", age, SizeEnum.MEDIUM, 30, languages, [], [], [], statBonuses);
     }
+
+    static generate() {
+        return {
+            missingArgs: [],
+            requiredArgs: [],
+            class: new Tiefling()
+        }
+    } 
 }

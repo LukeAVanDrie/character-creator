@@ -7,11 +7,11 @@ export default class CharacterSheet extends React.Component {
     constructor(props) {
         super(props);
 
-        const redirect = (localStorage.getItem("values")) ? false : true;
+        const redirect = (localStorage.getItem("character")) ? false : true;
         this.state = {
             edit: false,
             redirect: redirect,
-            values: JSON.parse(localStorage.getItem("values"))
+            character: JSON.parse(localStorage.getItem("character"))
         }
 
         this.editCharacter = this.editCharacter.bind(this);
@@ -34,13 +34,13 @@ export default class CharacterSheet extends React.Component {
                 />
             );
         }
-
+        
         return(
             <Layout.Grid areas={ ['general', 'edit'] }>
                 <Layout.Section area="general">
                     <Card>
                         <h2>General Information</h2>
-                        <StackedCard>{`Name: ${this.state.values.name}`}</StackedCard>
+                        <StackedCard>{`Name: ${this.state.character.name}`}</StackedCard>
                     </Card>
                 </Layout.Section>
                 <Layout.Section area="edit">

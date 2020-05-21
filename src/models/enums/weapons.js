@@ -1,4 +1,4 @@
-const WeaponEnum = {
+export const WeaponEnum = {
     BATTLE_AXE: 1,
     HAND_AXE: 2,
     LIGHT_HAMMER: 3,

@@ -1,4 +1,9 @@
-class Elf extends Race {
+import Race from "./race";
+import Age from "../age";
+import Stats from "../stats";
+import { LanguageEnum, SizeEnum, WeaponEnum } from "../enums/bundle";
+
+export class Elf extends Race {
     constructor(name, speed, otherLanguage, subWeaponProfs, subStatBonuses) {
         if (new.target === Elf) {
             throw new TypeError("cannot directly instantiate the abstract instance Elf")
@@ -17,8 +22,8 @@ class Elf extends Race {
     }
 }
 
-class HighElf extends Elf {
-    constuctor(language) {
+export class HighElf extends Elf {
+    constructor(language) {
         const weaponProfs = [
             WeaponEnum.LONGSWORD, 
             WeaponEnum.SHORTSWORD, 
@@ -30,10 +35,20 @@ class HighElf extends Elf {
 
         super("High Elf", 35, language, weaponProfs, statBonuses);
     }
+
+    static generate(args) {
+        const requiredArgs = ["language"];
+        const result = Race.validateArgs(args, requiredArgs);
+        return {
+            missingArgs: result.missingArgs,
+            requiredArgs: requiredArgs,
+            class: (result.missingArgs.length > 0) ? undefined : new HighElf(...result.finalArgs)
+        }
+    } 
 }
 
-class WoodElf extends Elf {
-    constuctor() {
+export class WoodElf extends Elf {
+    constructor() {
         const weaponProfs = [
             WeaponEnum.LONGSWORD, 
             WeaponEnum.SHORTSWORD, 
@@ -46,10 +61,18 @@ class WoodElf extends Elf {
 
         super("Wood Elf", 30, undefined, weaponProfs, statBonuses);
     }
+
+    static generate() {
+        return {
+            missingArgs: [],
+            requiredArgs: [],
+            class: new WoodElf()
+        }
+    } 
 }
 
-class DarkElf extends Elf {
-    constuctor() {
+export class DarkElf extends Elf {
+    constructor() {
         const weaponProfs = [
             WeaponEnum.RAPIER, 
             WeaponEnum.SHORTSWORD, 
@@ -61,4 +84,12 @@ class DarkElf extends Elf {
 
         super("Dark Elf", 30, undefined, weaponProfs, statBonuses);
     }
+
+    static generate() {
+        return {
+            missingArgs: [],
+            requiredArgs: [],
+            class: new DarkElf()
+        }
+    } 
 }

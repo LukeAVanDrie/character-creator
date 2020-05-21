@@ -1,4 +1,4 @@
-const ArmorEnum = {
+export const ArmorEnum = {
     LIGHT: 1,
     MEDIUM: 2
 }

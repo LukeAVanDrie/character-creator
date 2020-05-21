@@ -1,4 +1,4 @@
-class Stats {
+export default class Stats {
     constructor() {
         this.strength = 0;
         this.dexterity = 0;
@@ -21,7 +21,7 @@ class Stats {
             ...stats,
             ...otherStats
         }
-
+        
         Object.keys(stats).forEach(stat => {
             if (stats[stat]) {
                 newStats[stat] += stats[stat];
