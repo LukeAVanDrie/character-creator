@@ -1,6 +1,8 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
-import { Input, Button, Card, Dropdown } from "@wedgekit/core";
+import styled from "styled-components";
+import dotProp from "dot-prop";
+import { Input, Button, Card, Select, Option } from "@wedgekit/core";
 import Form, { Field } from "@wedgekit/form";
 import { Character } from "../models/bundle";
 import { 
@@ -10,18 +12,17 @@ import {
     LightfootHalfling, StoutHalfling, HalfOrc,
     Human, Tiefling, Race 
 } from "../models/races/bundle";
-import { LanguageEnum, ToolEnum, AncestryEnum, SizeEnum } from "../models/enums/bundle"; 
+import { LanguageEnum, ToolEnum, AncestryEnum } from "../models/enums/bundle"; 
 
-const styles = {
-    card: {
-        margin: "3em auto",
-        width: "50%",
-    },
-    button: {
-        margin: "1em auto",
-        width: "35%"
-    }
-}
+const StyledCard = styled(Card)`
+    margin: 3em auto;
+    width: 50%;
+`
+
+const StyledButton = styled(Button)`
+    margin: 1em auto;
+    width: 35%;
+`
 
 export default class CharacterForm extends React.Component {
     constructor(props) {
@@ -44,29 +45,28 @@ export default class CharacterForm extends React.Component {
             // miscellaneous
             redirect: redirect,
 
-            // dropdowns
-            subraceDropdown: false,
-            languageDropdown: false,
-            toolProficiencyDropdown: false,
-            ancestryDropdown: false,
-
             // character properties
             character: character,
-            race: character ? character.race : undefined,
+            race: dotProp.get(character, "race"),
 
             // form data
-            formName: formData ? formData.formName : "",
-            formRace: formData ? formData.formRace : undefined,
-            formSubrace: formData ? formData.formSubrace : undefined,
-            formLanguage: formData ? formData.formLanguage : undefined,
-            formToolProficiency: formData ? formData.formToolProficiency : undefined,
-            formAncestry: formData ? formData.formAncestry : undefined 
+            formName: dotProp.get(formData, "formName", ""),
+            formRace: dotProp.get(formData, "formRace"),
+            formSubrace: dotProp.get(formData, "formSubrace"),
+            formLanguage: dotProp.get(formData, "formLanguage"),
+            formToolProficiency: dotProp.get(formData, "formToolProficiency"),
+            formAncestry: dotProp.get(formData, "formAncestry"), 
+
+            // render data
+            subraceDropdown: dotProp.has(formData, "formRace") && Race.getSubraces(formData.formRace) !== undefined,
+            languageDropdown: dotProp.has(formData, "formLanguage"),
+            toolProficiencyDropdown: dotProp.has(formData, "formToolProficiency"),
+            ancestryDropdown: dotProp.has(formData, "formAncestry")
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.validCharacter = this.validCharacter.bind(this);
         this.generateRace = this.generateRace.bind(this);
-        this.componentDidMount = this.componentDidMount.bind(this);
     }
 
     handleSubmit = async () => {
@@ -84,7 +84,7 @@ export default class CharacterForm extends React.Component {
 
         localStorage.setItem("character", JSON.stringify(character));
 
-        // update formData
+        // update form data
         const formData = {
             formName: this.state.formName,
             formRace: this.state.formRace,
@@ -130,7 +130,7 @@ export default class CharacterForm extends React.Component {
         };
 
         this.setState({
-            subraceDropdown: this.state.formSubrace && (!races[this.state.formSubrace] || Race.getSubraces(this.state.formRace)),
+            subraceDropdown: this.state.formRace && Race.getSubraces(this.state.formRace) !== undefined,
             languageDropdown: false,
             toolProficiencyDropdown: false,
             ancestryDropdown: false
@@ -159,10 +159,6 @@ export default class CharacterForm extends React.Component {
             }
         });
     }
-
-    componentDidMount() {
-        this.generateRace();
-    }
     
     render() {
         if (this.state.redirect) {
@@ -171,30 +167,38 @@ export default class CharacterForm extends React.Component {
 
         const renderSubraceDropdown = () => {
             if (this.state.subraceDropdown) {
+                let subraces = Race.getSubraces(this.state.formRace) || [];
+                subraces = subraces.map(subrace => {
+                    return <Option key={ subrace.id } value={ subrace.id }>{ subrace.display }</Option>
+                });
+
                 return (
                     <Field
                         name="subRace"
                         label="Subrace"
                     >
-                        {({ fieldProps }) => <Dropdown { ...fieldProps } 
-                            options={ Race.getSubraces(this.state.formRace) } 
-                            selected={ this.state.formSubrace }
-                            onSelect={ selection => {
-                                this.setState({ formSubrace: selection }, () => {
-                                    this.generateRace();
-                                });
-                            }}
-                            caret/>
-                        }
-                </Field>
+                        {({ fieldProps }) => (
+                            <Select { ...fieldProps }
+                                value={ this.state.formSubrace }
+                                onChange={ value => {
+                                    this.setState({ formSubrace: value }, () => {
+                                        this.generateRace();
+                                    });
+                                }}
+                                required
+                            >
+                                { subraces }
+                            </Select>
+                        )}
+                    </Field>
                 );
             }
         }
 
         const renderLanguageDropdown = () => {
             if (this.state.languageDropdown) {
-                let languages = Object.keys(LanguageEnum).map(language => {
-                    return { id: language, display: LanguageEnum[language] };
+                const languages = Object.keys(LanguageEnum).map(language => {
+                    return <Option key={ language } value={ language }>{ LanguageEnum[language] }</Option>
                 });
 
                 return (
@@ -202,17 +206,20 @@ export default class CharacterForm extends React.Component {
                         name="language"
                         label="Additional Language"
                     >
-                        {({ fieldProps }) => <Dropdown { ...fieldProps } 
-                            options={ languages }
-                            selected={ this.state.formLanguage }
-                            onSelect={ selection => {
-                                this.setState({ formLanguage: selection }, () => {
-                                    this.generateRace();
-                                }); 
-                            }}
-                            caret/>
+                        {({ fieldProps }) => 
+                            <Select { ...fieldProps }
+                                value={ this.state.formLanguage }
+                                onChange={ value => {
+                                    this.setState({ formLanguage: value }, () => {
+                                        this.generateRace();
+                                    });
+                                }}
+                                required    
+                            >
+                                { languages }
+                            </Select>
                         }
-                </Field>
+                    </Field>
                 );
             }
         }
@@ -220,7 +227,7 @@ export default class CharacterForm extends React.Component {
         const renderToolProficiencyDropdown = () => {
             if (this.state.toolProficiencyDropdown) {
                 const tools = Object.keys(ToolEnum).map(tool => {
-                    return { id: tool, display: (tool.charAt(0) + tool.substring(1).toLowerCase()) }
+                    return <Option key={ tool } value={ tool }>{ ToolEnum[tool] }</Option>
                 });
 
                 return (
@@ -228,17 +235,20 @@ export default class CharacterForm extends React.Component {
                         name="tool"
                         label="Tool Proficiency"
                     >
-                        {({ fieldProps }) => <Dropdown { ...fieldProps } 
-                            options={ tools }
-                            selected={ this.state.formToolProficiency }
-                            onSelect={ selection => {
-                                this.setState({ formToolProficiency: selection }, () => {
-                                    this.generateRace();
-                                }); 
-                            }}
-                            caret/>
+                        {({ fieldProps }) => 
+                            <Select { ...fieldProps }
+                                value={ this.state.formToolProficiency }
+                                onChange={ value => {
+                                    this.setState({ formToolProficiency: value }, () => {
+                                        this.generateRace();
+                                    });
+                                }}
+                                required    
+                            >
+                                { tools }
+                            </Select>
                         }
-                </Field>
+                    </Field>
                 );
             }
         }
@@ -246,7 +256,7 @@ export default class CharacterForm extends React.Component {
         const renderAncestryDropdown = () => {
             if (this.state.ancestryDropdown) {
                 const ancestries = Object.keys(AncestryEnum).map(ancestry => {
-                    return { id: ancestry, display: AncestryEnum[ancestry] };
+                    return <Option key={ ancestry } value={ ancestry }>{ AncestryEnum[ancestry] }</Option>
                 });
 
                 return (
@@ -254,79 +264,83 @@ export default class CharacterForm extends React.Component {
                         name="ancestry"
                         label="Draconic Ancestry"
                     >
-                        {({ fieldProps }) => <Dropdown { ...fieldProps } 
-                            options={ ancestries }
-                            selected={ this.state.formAncestry }
-                            onSelect={ selection => {
-                                this.setState({ formAncestry: selection }, () => {
-                                    this.generateRace();
-                                }); 
-                            }}
-                            caret/>
+                        {({ fieldProps }) => 
+                            <Select { ...fieldProps }
+                                value={ this.state.formAncestry }
+                                onChange={ value => {
+                                    this.setState({ formAncestry: value }, () => {
+                                        this.generateRace();
+                                    });
+                                }}
+                                required    
+                            >
+                                { ancestries }
+                            </Select>
                         }
-                </Field>
+                    </Field>
                 );
             }
         }
 
         return (
-            <Card style={ styles.card }>
+            <StyledCard>
                 <h2>Create Your Character</h2>
-                <Form onSubmit={ this.handleSubmit }>
-                {({ formProps, submitting }) => (
-                    <form { ...formProps }>
-                        <Field
-                            name="name"
-                            label="Name"
-                            defaultValue={ this.state.formName }
-                        >
-                            {({ fieldProps }) => <Input { ...fieldProps }
-                                onChange={ value => this.setState({ formName: value }) }
-                                fullWidth/>
-                            }
-                        </Field>
-                        <Field
-                            name="race"
-                            label="Race"
-                        >
-                            {({ fieldProps }) => <Dropdown { ...fieldProps } 
-                                options={[
-                                    { id: "Dragonborn", display: "Dragonborn" },
-                                    { id: "Dwarf", display: "Dwarf" },
-                                    { id: "Elf", display: "Elf" },
-                                    { id: "Gnome", display: "Gnome" },
-                                    { id: "HalfElf", display: "Half-Elf" },
-                                    { id: "Halfling", display: "Halfling" },
-                                    { id: "HalfOrc", display: "Half-Orc" },
-                                    { id: "Human", display: "Human" },
-                                    { id: "Tiefling", display: "Tiefling" }
-                                ]} 
-                                selected={ this.state.formRace }
-                                onSelect={ selection => {
-                                    this.setState({ formRace: selection, formSubrace: selection }, () => {
-                                        this.generateRace();
-                                    });
-                                }}
-                                caret/>
-                            }
-                        </Field>
-                        { renderSubraceDropdown() }
-                        { renderLanguageDropdown() }
-                        { renderToolProficiencyDropdown() }
-                        { renderAncestryDropdown() }
-                        <Button 
-                            fullWidth 
-                            domain="primary" 
-                            type="submit" 
-                            disabled={ submitting || !this.validCharacter() } 
-                            style={ styles.button }
-                        >
-                            { localStorage.getItem("formData") ? "Save" : "Create" }
-                        </Button>
-                    </form>
-                )}
+                    <Form onSubmit={ this.handleSubmit }>
+                    {({ formProps, submitting }) => (
+                        <form { ...formProps }>
+                            <Field
+                                name="name"
+                                label="Name"
+                                defaultValue={ this.state.formName }
+                                required
+                            >
+                                {({ fieldProps }) => <Input { ...fieldProps }
+                                    onChange={ value => this.setState({ formName: value }) }
+                                    fullWidth/>
+                                }
+                            </Field>
+                            <Field
+                                name="race"
+                                label="Race"
+                            >
+                                {({ fieldProps }) => (
+                                    <Select { ...fieldProps }
+                                        value={ this.state.formRace }
+                                        onChange={ value => {
+                                            this.setState({ formRace: value, formSubrace: value }, () => {
+                                                this.generateRace();
+                                            });
+                                        }}
+                                        required    
+                                    >
+                                        <Option value="Dragonborn">Dragonborn</Option>
+                                        <Option value="Dwarf">Dwarf</Option>
+                                        <Option value="Elf">Elf</Option>
+                                        <Option value="Gnome">Gnome</Option>
+                                        <Option value="HalfElf">Half-Elf</Option>
+                                        <Option value="Halfling">Halfling</Option>
+                                        <Option value="HalfOrc">Half-Orc</Option>
+                                        <Option value="Human">Human</Option>
+                                        <Option value="Tiefling">Tiefling</Option>
+                                    </Select>
+                                )}
+                            </Field>
+                            { renderSubraceDropdown() }
+                            { renderLanguageDropdown() }
+                            { renderToolProficiencyDropdown() }
+                            { renderAncestryDropdown() }
+                            <StyledButton 
+                                fullWidth 
+                                domain="primary" 
+                                type="submit" 
+                                disabled={ submitting || !this.validCharacter() } 
+                            >
+                                { localStorage.getItem("formData") ? "Save" : "Create" }
+                            </StyledButton>
+                        </form>
+                    )}
                 </Form>
-            </Card>
+            </StyledCard>
         );
     }
 }

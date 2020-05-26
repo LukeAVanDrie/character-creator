@@ -5,11 +5,12 @@ import {
   Route,
   Redirect
 } from "react-router-dom";
+import Color from "@wedgekit/color";
 import CharacterForm from "./components/characterForm";
 import CharacterSheet from "./components/characterSheet";
 
 export default function App() {  
-  document.body.style = "background: #1B2027";
+  document.body.style = `background: ${Color.N500}`;
 
   return (
     <Router>
