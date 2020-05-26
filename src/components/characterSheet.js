@@ -1,17 +1,27 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
-import Layout from '@wedgekit/layout';
-import { Button, Card, StackedCard } from '@wedgekit/core';
+import styled from "styled-components";
+import Layout from "@wedgekit/layout";
+import { Button, Card, StackedCard } from "@wedgekit/core";
+
+const StyledCard = styled(Card)`
+    margin: 3em 3em 0em 3em;
+`
+
+const StyledButton = styled(Button)`
+    margin: 3em auto;
+    width: 35%;
+`
 
 export default class CharacterSheet extends React.Component {
     constructor(props) {
         super(props);
 
-        const redirect = (localStorage.getItem("values")) ? false : true;
+        const redirect = (localStorage.getItem("character")) ? false : true;
         this.state = {
             edit: false,
             redirect: redirect,
-            values: JSON.parse(localStorage.getItem("values"))
+            character: JSON.parse(localStorage.getItem("character"))
         }
 
         this.editCharacter = this.editCharacter.bind(this);
@@ -35,16 +45,41 @@ export default class CharacterSheet extends React.Component {
             );
         }
 
+        const renderAncestry = () => {
+            if (this.state.character.race.ancestry) {
+                return <StackedCard>{`Draconic Ancestry: ${this.state.character.race.ancestry}`}</StackedCard>
+            }
+        }
+        
         return(
-            <Layout.Grid areas={ ['general', 'edit'] }>
+            <Layout.Grid areas={ ["general", "proficiencies", "edit"] }>
                 <Layout.Section area="general">
-                    <Card>
+                    <StyledCard>
                         <h2>General Information</h2>
-                        <StackedCard>{`Name: ${this.state.values.name}`}</StackedCard>
-                    </Card>
+                        <StackedCard>{`Name: ${this.state.character.name}`}</StackedCard>
+                        <StackedCard>{`Race: ${this.state.character.race.name}`}</StackedCard>
+                        { renderAncestry() }
+                        <StackedCard>{`Languages: ${this.state.character.race.languages.join(", ") || "None"}`}</StackedCard>
+                        <StackedCard>{`Size: ${this.state.character.race.size}`}</StackedCard>
+                        <StackedCard>{`Speed: ${this.state.character.race.speed}ft`}</StackedCard>
+                    </StyledCard>
+                </Layout.Section>
+                <Layout.Section area="proficiencies">
+                    <StyledCard>
+                        <h2>Proficiencies</h2>
+                        <StackedCard>{`Weapons: ${this.state.character.race.weaponProfs.join(", ") || "None"}`}</StackedCard>
+                        <StackedCard>{`Armor: ${this.state.character.race.armorProfs.join(", ") || "None"}`}</StackedCard>
+                        <StackedCard>{`Tools: ${this.state.character.race.toolProfs.join(", ") || "None"}`}</StackedCard>
+                    </StyledCard>
                 </Layout.Section>
                 <Layout.Section area="edit">
-                    <Button classname="edit" domain="primary" onClick={ this.editCharacter }>Edit</Button>
+                    <StyledButton 
+                        fullWidth  
+                        domain="primary" 
+                        onClick={ this.editCharacter } 
+                    >
+                        Edit
+                    </StyledButton>
                 </Layout.Section>
             </Layout.Grid>
         );
